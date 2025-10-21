@@ -1,0 +1,19 @@
+# Java / Maven
+target/
+*.log
+*.class
+*.jar
+*.war
+# IntelliJ / VSCode / SO
+.idea/
+*.iml
+.vscode/
+.DS_Store
+# Build
+out/
+# Docker
+*.env
+.env.*
+docker-data/
+# Node (por las dudas)
+node_modules/
