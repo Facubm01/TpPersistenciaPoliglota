@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  # Servicio de PostgreSQL (núcleo transaccional)
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tpdb
+      MYSQL_USER: tpuser
+      MYSQL_PASSWORD: tppass
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Servicio de MongoDB (sensores, alertas, datos flexibles)
+  mongo:
+    image: mongo:latest
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo_data:/data/db
+
+  # Servicio de Cassandra (mediciones de series temporales)
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-db
+    ports:
+      # Puerto 9042 es para la comunicación con el cliente (CQL)
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+
+# Volúmenes para persistir los datos de cada base de datos
+volumes:
+  mysql_data:
+  mongo_data:
+  cassandra_data:
