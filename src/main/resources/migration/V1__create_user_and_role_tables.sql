@@ -2,18 +2,18 @@
 
 -- Tabla para almacenar los roles del sistema
 CREATE TABLE roles (
-    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT, -- CORRECCIÓN: 'IDENTITY(1,1)' cambiado a 'AUTO_INCREMENT'
     descripcion VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- Tabla para almacenar los usuarios
 CREATE TABLE usuarios (
-    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    id BIGINT PRIMARY KEY AUTO_INCREMENT, -- CORRECCIÓN: 'IDENTITY(1,1)' cambiado a 'AUTO_INCREMENT'
     nombre_completo VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     estado VARCHAR(20) NOT NULL,
-    fecha_registro DATETIME2 NOT NULL
+    fecha_registro DATETIME NOT NULL -- CORRECCIÓN: 'DATETIME2' cambiado a 'DATETIME' (sintaxis MySQL)
 );
 
 -- Tabla intermedia para la relación Muchos a Muchos entre usuarios y roles
