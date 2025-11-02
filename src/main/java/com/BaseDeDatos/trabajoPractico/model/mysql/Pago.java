@@ -1,9 +1,17 @@
 package com.BaseDeDatos.trabajoPractico.model.mysql;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Data
 @Entity
@@ -18,12 +26,15 @@ public class Pago {
     @JoinColumn(name = "factura_id", nullable = false)
     private Factura factura;
 
-    @Column(nullable = false)
+    // AÑADIDO: Mapeo explícito
+    @Column(name = "fecha_pago", nullable = false)
     private LocalDateTime fechaPago;
 
-    @Column(nullable = false)
+    // AÑADIDO: Mapeo explícito
+    @Column(name = "monto_pagado", nullable = false)
     private BigDecimal montoPagado;
 
-    @Column(nullable = false)
+    // AÑADIDO: Mapeo explícito
+    @Column(name = "metodo_pago", nullable = false)
     private String metodoPago;
 }
