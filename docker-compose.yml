@@ -1,12 +1,35 @@
-version: "3.8"
-
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      # Override Spring properties to talk to dockerized services
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tpdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: tpuser
+      SPRING_DATASOURCE_PASSWORD: tppass
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/tpsensores_meta?authSource=admin
+      SPRING_CASSANDRA_CONTACT_POINTS: cassandra
+      SPRING_CASSANDRA_PORT: 9042
+      SPRING_CASSANDRA_LOCAL_DATACENTER: datacenter1
+      SPRING_CASSANDRA_KEYSPACE_NAME: tpsensores
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      cassandra:
+        condition: service_healthy
   # Servicio de PostgreSQL (núcleo transaccional)
   mysql:
     image: mysql:8.0
     container_name: mysql-db
     ports:
-      - "3306:3306"
+      - "3307:3306" # cambia puerto host para evitar conflictos
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: tpdb
@@ -15,18 +38,24 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   # Servicio de MongoDB (sensores, alertas, datos flexibles)
   mongo:
     image: mongo:latest
     container_name: mongo-db
     ports:
-      - "27017:27017"
+      - "27018:27017" # cambia puerto host para evitar conflictos
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
       - mongo_data:/data/db
+    # Nota: se omite healthcheck por compatibilidad de cliente; la app espera a MySQL/Cassandra
 
   # Servicio de Cassandra (mediciones de series temporales)
   cassandra:
@@ -34,9 +63,14 @@ services:
     container_name: cassandra-db
     ports:
       # Puerto 9042 es para la comunicación con el cliente (CQL)
-      - "9042:9042"
+      - "9043:9042" # cambia puerto host para evitar conflictos
     volumes:
       - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE CLUSTER' 127.0.0.1 9042 || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
 
 # Volúmenes para persistir los datos de cada base de datos
 volumes:

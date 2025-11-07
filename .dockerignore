@@ -1,0 +1,23 @@
+# Build output
+/target
+
+# IDE
+/.idea
+/.project
+/.settings
+/.classpath
+**/*.iml
+/.vscode
+
+# Git
+/.git
+/.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven wrapper cache (optional)
+.mvn/wrapper/
+
+
