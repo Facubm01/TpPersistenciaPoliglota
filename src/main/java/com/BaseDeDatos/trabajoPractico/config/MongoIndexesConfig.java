@@ -18,14 +18,14 @@ public class MongoIndexesConfig {
         return args -> {
             // Índices para sensores: nombreCodigo único, geoespacial 2dsphere en ubicacion
             IndexOperations sensorIdx = mongoTemplate.indexOps("sensores");
-            sensorIdx.ensureIndex(new Index().on("nombreCodigo", Sort.Direction.ASC).unique());
-            sensorIdx.ensureIndex(new GeospatialIndex("ubicacion").typed(GeoSpatialIndexType.GEO_2DSPHERE));
+            sensorIdx.createIndex(new Index().on("nombreCodigo", Sort.Direction.ASC).unique());
+            sensorIdx.createIndex(new GeospatialIndex("ubicacion").typed(GeoSpatialIndexType.GEO_2DSPHERE));
 
             // Índices para alertas: TTL por fechaHora (por ejemplo 30 días)
             IndexOperations alertasIdx = mongoTemplate.indexOps("alertas");
-            alertasIdx.ensureIndex(new Index().on("fechaHora", Sort.Direction.ASC).expire(60L * 60L * 24L * 30L));
-            alertasIdx.ensureIndex(new Index().on("sensorId", Sort.Direction.ASC));
-            alertasIdx.ensureIndex(new Index().on("tipo", Sort.Direction.ASC));
+            alertasIdx.createIndex(new Index().on("fechaHora", Sort.Direction.ASC).expire(60L * 60L * 24L * 30L));
+            alertasIdx.createIndex(new Index().on("sensorId", Sort.Direction.ASC));
+            alertasIdx.createIndex(new Index().on("tipo", Sort.Direction.ASC));
         };
     }
 }

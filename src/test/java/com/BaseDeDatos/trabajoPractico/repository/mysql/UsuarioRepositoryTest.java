@@ -1,6 +1,7 @@
 package com.BaseDeDatos.trabajoPractico.repository.mysql;
 
 import com.BaseDeDatos.trabajoPractico.model.mysql.Usuario;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UsuarioRepositoryTest {
 
-    @SuppressWarnings("resource")   // evita el warning de "resource leak"
+    @SuppressWarnings("resource") // evita el warning de "resource leak" - Testcontainers maneja el ciclo de vida automáticamente
     @Container
     private static final MySQLContainer<?> mysql =
             new MySQLContainer<>("mysql:8.0")
