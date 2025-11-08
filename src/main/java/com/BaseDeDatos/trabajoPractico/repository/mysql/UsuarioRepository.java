@@ -8,5 +8,6 @@ import com.BaseDeDatos.trabajoPractico.model.mysql.Usuario;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // Ejemplo de método personalizado
+    
     Usuario findByEmail(String email);
 }
