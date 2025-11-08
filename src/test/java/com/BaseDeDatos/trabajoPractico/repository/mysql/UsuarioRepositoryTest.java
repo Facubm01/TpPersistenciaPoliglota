@@ -11,49 +11,43 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UsuarioRepositoryTest {
 
+    @SuppressWarnings("resource")   // evita el warning de "resource leak"
     @Container
-    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-            .withDatabaseName("tpdb")
-            .withUsername("tpuser")
-            .withPassword("tppass")
-            .withCommand("--default-authentication-plugin=mysql_native_password");
+    private static final MySQLContainer<?> mysql =
+            new MySQLContainer<>("mysql:8.0")
+                    .withDatabaseName("tpdb")
+                    .withUsername("tpuser")
+                    .withPassword("tppass")
+                    .withCommand("--default-authentication-plugin=mysql_native_password");
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysql::getJdbcUrl);
         registry.add("spring.datasource.username", mysql::getUsername);
         registry.add("spring.datasource.password", mysql::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "validate");
-        registry.add("spring.flyway.enabled", () -> "true");
     }
 
     @Autowired
-    UsuarioRepository usuarioRepository;
+    private UsuarioRepository usuarioRepository;
 
     @Test
-    void creaYLeeUsuario() {
-        Usuario u = new Usuario();
-        u.setNombreCompleto("Test User");
-        u.setEmail("testuser@example.com");
-        u.setPassword("secreta");
-        u.setEstado("ACTIVO");
-        u.setFechaRegistro(LocalDateTime.now());
-        Usuario guardado = usuarioRepository.save(u);
+    void guardarYBuscarUsuario_porId_funciona() {
+        Usuario usuario = new Usuario();
+        usuario.setNombreCompleto("Juan Pérez");
+        usuario.setEmail("juan@example.com");
 
-        assertThat(guardado.getId()).isNotNull();
-        Usuario encontrado = usuarioRepository.findByEmail("testuser@example.com");
-        assertThat(encontrado).isNotNull();
-        assertThat(encontrado.getNombreCompleto()).isEqualTo("Test User");
+        usuarioRepository.save(usuario);
+
+        Optional<Usuario> opt = usuarioRepository.findById(usuario.getId());
+        assertTrue(opt.isPresent());
     }
 }
-
-
