@@ -1,6 +1,7 @@
 package com.BaseDeDatos.trabajoPractico.repository.mysql;
 
 import com.BaseDeDatos.trabajoPractico.model.mysql.Usuario;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UsuarioRepositoryTest {
 
     @Container
+    @SuppressWarnings("resource") // Testcontainers maneja el ciclo de vida automáticamente
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("tpdb")
             .withUsername("tpuser")
