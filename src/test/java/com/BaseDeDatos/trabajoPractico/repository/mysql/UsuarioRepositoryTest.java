@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UsuarioRepositoryTest {
 
-    @SuppressWarnings("resource")   // evita el warning de "resource leak"
+    @SuppressWarnings("resource") // evita el warning de "resource leak" - Testcontainers maneja el ciclo de vida automáticamente
     @Container
     private static final MySQLContainer<?> mysql =
             new MySQLContainer<>("mysql:8.0")

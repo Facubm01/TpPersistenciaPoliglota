@@ -69,7 +69,9 @@ public class AuthCommands {
 
         return "Sesión cerrada para el usuario " + email;
     }
-
+    public Sesion getSesionActiva() {
+        return sesionActiva;
+    }
     @ShellMethod(key = "whoami", value = "Muestra el usuario actualmente logueado")
     public String whoAmI() {
     if (sesionActiva == null || !"ACTIVA".equalsIgnoreCase(sesionActiva.getEstado())) {
