@@ -5,7 +5,6 @@ import com.BaseDeDatos.trabajoPractico.model.mysql.Sesion;
 import com.BaseDeDatos.trabajoPractico.model.mysql.Usuario;
 import com.BaseDeDatos.trabajoPractico.repository.mysql.SesionRepository;
 import com.BaseDeDatos.trabajoPractico.repository.mysql.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
