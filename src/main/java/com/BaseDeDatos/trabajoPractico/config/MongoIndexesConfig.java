@@ -26,6 +26,14 @@ public class MongoIndexesConfig {
             alertasIdx.createIndex(new Index().on("fechaHora", Sort.Direction.ASC).expire(60L * 60L * 24L * 30L));
             alertasIdx.createIndex(new Index().on("sensorId", Sort.Direction.ASC));
             alertasIdx.createIndex(new Index().on("tipo", Sort.Direction.ASC));
+
+            // Índices para controles de funcionamiento: sensorId y estadoSensor para búsquedas rápidas
+            IndexOperations controlesIdx = mongoTemplate.indexOps("controles_funcionamiento");
+            controlesIdx.createIndex(new Index().on("sensorId", Sort.Direction.ASC));
+            controlesIdx.createIndex(new Index().on("estadoSensor", Sort.Direction.ASC));
+            controlesIdx.createIndex(new Index().on("fechaRevision", Sort.Direction.DESC));
+            // Índice compuesto para búsquedas por sensor y estado
+            controlesIdx.createIndex(new Index().on("sensorId", Sort.Direction.ASC).on("estadoSensor", Sort.Direction.ASC));
         };
     }
 }
