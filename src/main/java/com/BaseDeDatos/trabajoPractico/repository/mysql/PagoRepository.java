@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Long> {
-    // Aquí puedes agregar métodos como:
+    java.util.List<Pago> findByFacturaId(Long facturaId);
 }

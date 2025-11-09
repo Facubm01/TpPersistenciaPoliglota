@@ -58,7 +58,7 @@ public class MensajeCommands {
     ) {
         try {
             Long remitenteId = getUsuarioIdActivo();
-            Mensaje mensaje = mensajeService.enviarMensajeGrupal(remitenteId, nombreGrupo, contenido);
+            mensajeService.enviarMensajeGrupal(remitenteId, nombreGrupo, contenido);
             return String.format("Mensaje grupal enviado a '%s' por Usuario ID %d.",
                     nombreGrupo, remitenteId);
         } catch (Exception e) {

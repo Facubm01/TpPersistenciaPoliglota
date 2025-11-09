@@ -1,7 +1,6 @@
 package com.BaseDeDatos.trabajoPractico.repository.mysql;
 
 import com.BaseDeDatos.trabajoPractico.model.mysql.Usuario;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,6 +11,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,6 +45,9 @@ class UsuarioRepositoryTest {
         Usuario usuario = new Usuario();
         usuario.setNombreCompleto("Juan Pérez");
         usuario.setEmail("juan@example.com");
+        usuario.setPassword("password123");
+        usuario.setEstado("ACTIVO");
+        usuario.setFechaRegistro(LocalDateTime.now());
 
         usuarioRepository.save(usuario);
 

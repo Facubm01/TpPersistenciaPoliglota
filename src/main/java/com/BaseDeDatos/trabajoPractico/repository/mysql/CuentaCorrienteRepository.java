@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CuentaCorrienteRepository extends JpaRepository<CuentaCorriente, Long> {
-    // Aquí puedes agregar métodos como:
+    java.util.Optional<CuentaCorriente> findByUsuarioId(Long usuarioId);
 }

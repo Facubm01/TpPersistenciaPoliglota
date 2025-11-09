@@ -16,7 +16,6 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final SesionRepository sesionRepository;
 
-    
     public AuthService(UsuarioRepository usuarioRepository, SesionRepository sesionRepository) {
         this.usuarioRepository = usuarioRepository;
         this.sesionRepository = sesionRepository;
@@ -26,10 +25,18 @@ public class AuthService {
      * Intenta autenticar a un usuario y crear un registro de sesión.
      * @param email Email del usuario.
      * @param password Contraseña en texto plano.
-     * @return La entidad Sesion creada si el login es exitoso.
-     * @throws RuntimeException si las credenciales son incorrectas o el usuario no tiene roles.
+     * @return La entidad Sesion creada si el login es exitoso, con exitoso=true.
+     * @throws IllegalArgumentException si las credenciales son incorrectas o el usuario no tiene roles.
      */
     public Sesion login(String email, String password) {
+        // Validación de parámetros de entrada
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("El email no puede ser nulo o vacío");
+        }
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("La contraseña no puede ser nula o vacía");
+        }
+
         Usuario usuario = usuarioRepository.findByEmail(email);
 
         // --- AVISO DE SEGURIDAD IMPORTANTE ---
@@ -38,44 +45,52 @@ public class AuthService {
         // El password guardado en la BD debería estar hasheado.
         // La comparación correcta sería: passwordEncoder.matches(password, usuario.getPassword())
         // ----------------------------------------
-        if (usuario != null && usuario.getPassword().equals(password)) {
-
-            // Verifica que el usuario tenga al menos un rol asignado
-            if (usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
-                throw new RuntimeException("El usuario '" + email + "' no tiene roles asignados.");
-            }
-
-            // Toma el primer rol del Set de roles del usuario
-            Rol rolUsuario = usuario.getRoles().iterator().next();
-
-            // Crea la nueva sesión
-            Sesion nuevaSesion = new Sesion();
-            nuevaSesion.setUsuario(usuario);
-            nuevaSesion.setRol(rolUsuario); // Asigna el rol a la sesión
-            nuevaSesion.setFechaHoraInicio(LocalDateTime.now());
-            nuevaSesion.setEstado("ACTIVA");
-
-            return sesionRepository.save(nuevaSesion);
-        } else {
-            throw new RuntimeException("Credenciales inválidas para el email: " + email);
+        if (usuario == null) {
+            throw new IllegalArgumentException("Credenciales inválidas");
         }
+
+        if (!usuario.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Credenciales inválidas");
+        }
+
+        // Verifica que el usuario tenga al menos un rol asignado
+        if (usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
+            throw new IllegalArgumentException("El usuario no tiene roles asignados");
+        }
+
+        // Toma el primer rol del Set de roles del usuario
+        Rol rolUsuario = usuario.getRoles().iterator().next();
+
+        // Crea la nueva sesión
+        Sesion nuevaSesion = new Sesion();
+        nuevaSesion.setUsuario(usuario);
+        nuevaSesion.setRol(rolUsuario);
+        nuevaSesion.setFechaHoraInicio(LocalDateTime.now());
+        nuevaSesion.setEstado("ACTIVA");
+        nuevaSesion.setExitoso(true); // Marca la sesión como exitosa
+
+        return sesionRepository.save(nuevaSesion);
     }
 
     /**
      * Cierra la sesión de un usuario.
      * @param sesionId El ID de la sesión a cerrar.
-     * @throws RuntimeException si no se encuentra la sesión.
+     * @throws IllegalArgumentException si el ID es nulo o no se encuentra la sesión.
      */
     public void logout(Long sesionId) {
+        if (sesionId == null) {
+            throw new IllegalArgumentException("El ID de sesión no puede ser nulo");
+        }
+
         Optional<Sesion> sesionOpt = sesionRepository.findById(sesionId);
 
-        if (sesionOpt.isPresent()) {
-            Sesion sesion = sesionOpt.get();
-            sesion.setEstado("INACTIVA");
-            sesion.setFechaHoraCierre(LocalDateTime.now());
-            sesionRepository.save(sesion);
-        } else {
-            throw new RuntimeException("No se encontró la sesión con ID: " + sesionId);
+        if (sesionOpt.isEmpty()) {
+            throw new IllegalArgumentException("No se encontró la sesión con ID: " + sesionId);
         }
+
+        Sesion sesion = sesionOpt.get();
+        sesion.setEstado("INACTIVA");
+        sesion.setFechaHoraCierre(LocalDateTime.now());
+        sesionRepository.save(sesion);
     }
 }
