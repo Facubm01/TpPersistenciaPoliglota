@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MedicionRepository extends CassandraRepository<Medicion, MedicionKey> {
     List<Medicion> findByKeySensorIdAndKeyFechaHoraBetween(String sensorId, Instant start, Instant end);
+    List<Medicion> findByKeySensorIdInAndKeyFechaHoraBetween(List<String> sensorIds, Instant start, Instant end);
 }
+    
