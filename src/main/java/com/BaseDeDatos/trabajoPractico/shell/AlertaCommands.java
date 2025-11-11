@@ -50,7 +50,7 @@ public class AlertaCommands {
         }
         
         // 2. Formatear la salida para la consola
-        StringBuilder sb = new StringBuilder("\n🚨 LISTA DE ALERTAS (" + alertas.size() + ")\n");
+        StringBuilder sb = new StringBuilder("\n LISTA DE ALERTAS (" + alertas.size() + ")\n");
         sb.append("--------------------------------------------------\n");
         
         for (Alerta a : alertas) {

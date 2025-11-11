@@ -1,11 +1,11 @@
 package com.BaseDeDatos.trabajoPractico.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class ControlFuncionamientoDto {
     public String id;
     public String sensorId;
-    public Date fechaRevision;
+    public java.time.LocalDateTime fechaRevision;
     public String estadoSensor;
     public String observaciones;
 }

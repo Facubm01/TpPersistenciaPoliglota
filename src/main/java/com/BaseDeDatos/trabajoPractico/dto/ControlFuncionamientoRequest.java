@@ -3,15 +3,16 @@ package com.BaseDeDatos.trabajoPractico.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
-import java.util.Date;
 
+@Data
 public class ControlFuncionamientoRequest {
     @NotBlank(message = "El ID del sensor es requerido")
     public String sensorId;
 
     @NotNull(message = "La fecha de revisión es requerida")
-    public Date fechaRevision;
+    private java.time.LocalDateTime fechaRevision;
 
     @NotBlank(message = "El estado del sensor es requerido")
     @Size(max = 50)

@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Document(collection = "controles_funcionamiento")
@@ -15,7 +15,7 @@ public class ControlFuncionamiento {
 
     private String sensorId; // Referencia al sensor (ID del sensor en MongoDB)
 
-    private Date fechaRevision; // Fecha de revisión
+    private java.time.LocalDateTime fechaRevision; // Fecha de revisión
 
     private String estadoSensor; // Estado del sensor: "activo", "inactivo", "falla", "mantenimiento", etc.
 
