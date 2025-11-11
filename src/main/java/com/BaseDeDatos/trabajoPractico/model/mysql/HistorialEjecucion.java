@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "historial_ejecuciones") // El nombre de la tabla que definimos en el SQL
+@Table(name = "historial_movimientos") // El nombre de la tabla que definimos en el SQL
 public class HistorialEjecucion {
 
     @Id
