@@ -2,7 +2,9 @@ package com.BaseDeDatos.trabajoPractico.service;
 
 import com.BaseDeDatos.trabajoPractico.dto.HistorialEjecucionDto;
 import com.BaseDeDatos.trabajoPractico.model.mysql.HistorialEjecucion;
+import com.BaseDeDatos.trabajoPractico.model.mysql.SolicitudDeProceso;
 import com.BaseDeDatos.trabajoPractico.repository.mysql.HistorialEjecucionRepository;
+import com.BaseDeDatos.trabajoPractico.repository.mysql.SolicitudDeProcesoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +16,12 @@ import java.util.stream.Collectors;
 public class HistorialEjecucionService {
 
     private final HistorialEjecucionRepository historialRepository;
+    private final SolicitudDeProcesoRepository solicitudRepository;
 
-    public HistorialEjecucionService(HistorialEjecucionRepository historialRepository) {
+    public HistorialEjecucionService(HistorialEjecucionRepository historialRepository,
+                                     SolicitudDeProcesoRepository solicitudRepository) {
         this.historialRepository = historialRepository;
+        this.solicitudRepository = solicitudRepository;
     }
 
     // --- Método para convertir Entidad a DTO ---
@@ -39,21 +44,11 @@ public class HistorialEjecucionService {
         
         HistorialEjecucion registro = new HistorialEjecucion();
         
-        // Aquí asumimos que tienes la entidad SolicitudProceso y su repositorio
-        // y que el modelo HistorialEjecucion tiene una relación @ManyToOne con SolicitudProceso.
-        // Si no tienes la relación, puedes guardar solo el ID.
-        // Por simplicidad, este código asume que el repositorio de Solicitud no se inyecta aquí
-        // y que el modelo HistorialEjecucion puede guardar el ID o la entidad.
+        // Obtener la solicitud para establecer la relación
+        SolicitudDeProceso solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada con ID: " + solicitudId));
         
-        // --- Simplificación: Asumimos que el modelo guarda la entidad SolicitudProceso ---
-        // SolicitudProceso solicitud = solicitudRepository.findById(solicitudId)
-        //     .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
-        // registro.setSolicitud(solicitud);
-
-        // --- Alternativa: Si tu modelo guarda solo el ID (ajusta tu entidad si es necesario) ---
-        // registro.setSolicitudId(solicitudId); 
-        // Por ahora, lo dejo comentado. Debes ajustar esto a tu modelo `HistorialEjecucion.java`.
-        
+        registro.setSolicitud(solicitud);
         registro.setFechaEjecucion(LocalDateTime.now());
         registro.setResultado(resultado);
         registro.setEstado(estado);
@@ -67,10 +62,7 @@ public class HistorialEjecucionService {
      * Cumple la consigna "Historial de ejecución de procesos".
      */
     public List<HistorialEjecucionDto> obtenerHistorialPorSolicitud(Long solicitudId) {
-        // Necesitarás este método en tu HistorialEjecucionRepository:
-        // List<HistorialEjecucion> findBySolicitudId(Long solicitudId);
-        
-        return historialRepository.findBySolicitudId(solicitudId).stream()
+        return historialRepository.findBySolicitud_Id(solicitudId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }

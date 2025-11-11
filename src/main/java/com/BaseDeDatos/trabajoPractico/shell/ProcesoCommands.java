@@ -12,6 +12,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import java.math.BigDecimal; // Necesario para el costo
+import java.util.List;
 
 @ShellComponent
 public class ProcesoCommands {
@@ -91,6 +92,50 @@ public class ProcesoCommands {
 
         } catch (Exception e) {
             return "Error al crear la solicitud: " + e.getMessage();
+        }
+    }
+
+    /**
+     * Comando para listar todas las solicitudes de procesos.
+     * Cumple el requisito: "Lista de procesos solicitados por usuario indicando si los mismos están pendientes o completados".
+     */
+    @ShellMethod(value = "Lista todas las solicitudes de procesos con su estado", key = "listar-solicitudes")
+    public String listarSolicitudes() {
+        Sesion sesionActiva = authCommands.getSesionActiva();
+        if (sesionActiva == null) {
+            return "Error: Debes iniciar sesión primero. Usa: login <email> <password>";
+        }
+
+        try {
+            List<SolicitudDeProcesoDto> solicitudes = solicitudProcesoService.listar();
+            
+            if (solicitudes.isEmpty()) {
+                return "No hay solicitudes de procesos registradas.";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("📋 Lista de Solicitudes de Procesos\n");
+            sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            
+            for (SolicitudDeProcesoDto s : solicitudes) {
+                sb.append(String.format("ID: %d | Usuario: %s (%s) | Proceso: %s\n", 
+                    s.id, 
+                    s.usuarioEmail, 
+                    s.usuarioId,
+                    s.procesoNombre));
+                sb.append(String.format("  Estado: %s | Fecha: %s\n", 
+                    s.estado, 
+                    s.fechaSolicitud));
+                if (s.facturaId != null) {
+                    sb.append(String.format("  Factura ID: %d\n", s.facturaId));
+                }
+                sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+            }
+            
+            return sb.toString();
+
+        } catch (Exception e) {
+            return "Error al listar solicitudes: " + e.getMessage();
         }
     }
 }

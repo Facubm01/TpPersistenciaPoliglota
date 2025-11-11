@@ -3,7 +3,9 @@ package com.BaseDeDatos.trabajoPractico.service;
 import com.BaseDeDatos.trabajoPractico.dto.UsuarioCreateRequest;
 import com.BaseDeDatos.trabajoPractico.dto.UsuarioDto;
 import com.BaseDeDatos.trabajoPractico.dto.UsuarioUpdateRequest;
+import com.BaseDeDatos.trabajoPractico.model.mysql.Rol;
 import com.BaseDeDatos.trabajoPractico.model.mysql.Usuario;
+import com.BaseDeDatos.trabajoPractico.repository.mysql.RolRepository;
 import com.BaseDeDatos.trabajoPractico.repository.mysql.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +18,11 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, RolRepository rolRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
     }
 
     private UsuarioDto toDto(Usuario u) {
@@ -66,6 +70,27 @@ public class UsuarioService {
     @Transactional
     public void eliminar(Long id) {
         usuarioRepository.deleteById(id);
+    }
+
+    /**
+     * Asigna un rol a un usuario.
+     * Si el usuario ya tiene el rol, no se duplica.
+     */
+    @Transactional
+    public UsuarioDto asignarRol(Long usuarioId, String descripcionRol) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + usuarioId));
+        
+        Rol rol = rolRepository.findByDescripcion(descripcionRol);
+        if (rol == null) {
+            throw new IllegalArgumentException("Rol no encontrado: " + descripcionRol);
+        }
+        
+        // Agregar el rol al usuario (Set evita duplicados)
+        usuario.getRoles().add(rol);
+        
+        Usuario guardado = usuarioRepository.save(usuario);
+        return toDto(guardado);
     }
 }
 

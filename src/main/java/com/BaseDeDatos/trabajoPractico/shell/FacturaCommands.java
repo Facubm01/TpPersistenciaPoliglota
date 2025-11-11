@@ -2,7 +2,6 @@ package com.BaseDeDatos.trabajoPractico.shell;
 
 import com.BaseDeDatos.trabajoPractico.dto.FacturaDto;
 import com.BaseDeDatos.trabajoPractico.dto.FacturaRequest;
-import com.BaseDeDatos.trabajoPractico.dto.SolicitudDeProcesoDto;
 import com.BaseDeDatos.trabajoPractico.service.FacturaService;
 import com.BaseDeDatos.trabajoPractico.service.SolicitudProcesoService;
 import org.springframework.shell.standard.ShellComponent;

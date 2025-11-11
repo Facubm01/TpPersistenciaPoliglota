@@ -17,8 +17,49 @@ public class ReporteController {
     }
 
     /**
-     * Endpoint para "Servicios de consultas en línea..." 
-     * Este es un ejemplo. La lógica de negocio real debería estar en ReporteService.
+     * Endpoint para generar informe de máximas y mínimas.
+     * Requiere una solicitud de proceso existente.
+     */
+    @PostMapping("/maxmin")
+    public ResponseEntity<String> generarReporteMaxMin(
+            @RequestParam Long solicitudId,
+            @RequestParam String zona,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+        
+        try {
+            reporteService.generarInformeMaxMin(solicitudId, zona, fechaInicio, fechaFin);
+            return ResponseEntity.ok("Reporte de máximas y mínimas generado exitosamente para la solicitud ID: " + solicitudId);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al generar reporte: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Endpoint para generar informe de promedios.
+     * Requiere una solicitud de proceso existente.
+     */
+    @PostMapping("/promedios")
+    public ResponseEntity<String> generarReportePromedios(
+            @RequestParam Long solicitudId,
+            @RequestParam String zona,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
+        
+        try {
+            reporteService.generarInformePromedios(solicitudId, zona, fechaInicio, fechaFin);
+            return ResponseEntity.ok("Reporte de promedios generado exitosamente para la solicitud ID: " + solicitudId);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al generar reporte: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Endpoint para "Servicios de consultas en línea..."
+     * Nota: Este endpoint está simplificado ya que los métodos del servicio
+     * requieren solicitudId y guardan en historial. Para una consulta en línea
+     * pura, se necesitaría un método adicional en ReporteService que devuelva
+     * el resultado sin guardarlo.
      */
     @GetMapping("/consulta-en-linea")
     public ResponseEntity<String> consultaEnLinea(
@@ -26,18 +67,15 @@ public class ReporteController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
         
-        // Esta es una implementación SIMPLIFICADA.
-        // Lo ideal es que ReporteService tenga un método "consultarMaxMin"
-        // que DEVUELVA el resultado en lugar de guardarlo en el historial.
+        // Nota: Para una consulta en línea real, se necesitaría un método en ReporteService
+        // que devuelva el resultado sin guardarlo en historial. Por ahora, este endpoint
+        // informa que se debe usar el endpoint de mediciones directamente.
         
-        // Aquí simulamos una llamada:
-        // ReporteResultadoDto resultado = reporteService.consultarMaxMinEnLinea(zona, fechaInicio, fechaFin);
-        // return ResponseEntity.ok(resultado);
-
-        String simulaResultado = String.format(
-            "Consulta en línea para %s desde %s hasta %s (simulado)",
+        String mensaje = String.format(
+            "Para consultas en línea directas, use el endpoint de mediciones: /api/mediciones/buscar?sensorId=...&inicio=...&fin=...\n" +
+            "Consulta solicitada para zona: %s, desde %s hasta %s",
             zona, fechaInicio, fechaFin
         );
-        return ResponseEntity.ok(simulaResultado);
+        return ResponseEntity.ok(mensaje);
     }
 }

@@ -85,6 +85,63 @@ public class ReporteService {
     }
 
     /**
+     * Lógica para "Informe de promedios de humedad y temperatura..."
+     * Similar a generarInformeMaxMin pero calcula promedios en lugar de máximos/mínimos.
+     */
+    public void generarInformePromedios(Long solicitudId, String zona, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        String resultado;
+        String estado;
+        
+        try {
+            // PASO 1: Consultar a MongoDB
+            List<Sensor> sensoresEnZona = sensorRepository.findByPais(zona); // Simplificación
+            List<String> sensorIds = sensoresEnZona.stream().map(Sensor::getId).toList();
+
+            if (sensorIds.isEmpty()) {
+                throw new RuntimeException("No se encontraron sensores para la zona: " + zona);
+            }
+
+            // PASO 2: Consultar a Cassandra
+            Instant startInstant = fechaInicio.toInstant(ZoneOffset.UTC);
+            Instant endInstant = fechaFin.toInstant(ZoneOffset.UTC);
+            List<Medicion> mediciones = medicionRepository.findByKeySensorIdInAndKeyFechaHoraBetween(sensorIds, startInstant, endInstant);
+
+            if (mediciones.isEmpty()) {
+                throw new RuntimeException("No se encontraron mediciones para el rango de fechas.");
+            }
+            
+            // PASO 3: Calcular el reporte de promedios (Lógica de negocio)
+            double promedioTemp = mediciones.stream()
+                    .mapToDouble(Medicion::getTemperatura)
+                    .average()
+                    .orElse(0);
+            double promedioHum = mediciones.stream()
+                    .mapToDouble(Medicion::getHumedad)
+                    .average()
+                    .orElse(0);
+            long cantidadMediciones = mediciones.size();
+
+            resultado = String.format(
+                "Reporte de Promedios para '%s': [Temp Promedio: %.2f, Hum Promedio: %.2f, Total Mediciones: %d]",
+                zona, promedioTemp, promedioHum, cantidadMediciones
+            );
+            
+            // PASO 4: Actualizar MySQL
+            solicitudProcesoService.actualizarEstado(solicitudId, "completado");
+            estado = "COMPLETADO";
+
+        } catch (RuntimeException e) {
+            // Manejo de errores
+            solicitudProcesoService.actualizarEstado(solicitudId, "fallido");
+            resultado = "Error al generar el reporte: " + e.getMessage();
+            estado = "FALLIDO";
+        }
+        
+        // PASO 5: Registrar en Historial (MySQL)
+        historialEjecucionService.registrarEjecucion(solicitudId, resultado, estado);
+    }
+
+    /**
      * Lógica para "Procesos periódicos de consultas..."
      */
     public void ejecutarProcesoPeriodico() {

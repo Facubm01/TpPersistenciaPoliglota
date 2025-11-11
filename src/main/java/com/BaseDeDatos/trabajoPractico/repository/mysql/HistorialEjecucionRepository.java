@@ -12,9 +12,8 @@ public interface HistorialEjecucionRepository extends JpaRepository<HistorialEje
     /**
      * Método requerido por HistorialEjecucionService.
      * Busca todas las entradas de historial asociadas a un ID de solicitud específico.
-     * Asume que en tu entidad 'HistorialEjecucion' tienes un campo 'solicitud'
-     * y que ese campo 'solicitud' tiene un campo 'id'.
+     * Usa la sintaxis correcta para relaciones @ManyToOne: findBySolicitud_Id
      */
-    List<HistorialEjecucion> findBySolicitudId(Long solicitudId);
+    List<HistorialEjecucion> findBySolicitud_Id(Long solicitudId);
     
 }
