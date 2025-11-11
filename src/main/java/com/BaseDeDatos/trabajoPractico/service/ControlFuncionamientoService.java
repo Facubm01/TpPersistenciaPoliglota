@@ -5,25 +5,25 @@ import com.BaseDeDatos.trabajoPractico.dto.ControlFuncionamientoRequest;
 import com.BaseDeDatos.trabajoPractico.model.mongo.ControlFuncionamiento;
 import com.BaseDeDatos.trabajoPractico.repository.mongo.ControlFuncionamientoRepository;
 import com.BaseDeDatos.trabajoPractico.repository.mongo.SensorRepository;
+import lombok.RequiredArgsConstructor; // <-- Importación para el constructor automático
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor // <-- AÑADIDO: Genera el constructor para los campos 'final'
 public class ControlFuncionamientoService {
 
+    // Deben ser 'final' para que Lombok los inyecte en el constructor
     private final ControlFuncionamientoRepository controlRepository;
     private final SensorRepository sensorRepository;
 
-    public ControlFuncionamientoService(ControlFuncionamientoRepository controlRepository,
-                                       SensorRepository sensorRepository) {
-        this.controlRepository = controlRepository;
-        this.sensorRepository = sensorRepository;
-    }
+    // EL CONSTRUCTOR MANUAL SE ELIMINA GRACIAS A @RequiredArgsConstructor
 
     private ControlFuncionamientoDto toDto(ControlFuncionamiento c) {
         ControlFuncionamientoDto dto = new ControlFuncionamientoDto();
+        
         dto.id = c.getId();
         dto.sensorId = c.getSensorId();
         dto.fechaRevision = c.getFechaRevision();
@@ -57,16 +57,18 @@ public class ControlFuncionamientoService {
     }
 
     public ControlFuncionamientoDto crear(ControlFuncionamientoRequest req) {
-        // Validar que el sensor existe
-        if (!sensorRepository.existsById(req.sensorId)) {
-            throw new IllegalArgumentException("Sensor no encontrado con ID: " + req.sensorId);
+        // Validar que el sensor existe (USO DEL GETTER CORREGIDO)
+        if (!sensorRepository.existsById(req.getSensorId())) {
+            throw new IllegalArgumentException("Sensor no encontrado con ID: " + req.getSensorId());
         }
 
         ControlFuncionamiento control = new ControlFuncionamiento();
-        control.setSensorId(req.sensorId);
-        control.setFechaRevision(req.fechaRevision);
-        control.setEstadoSensor(req.estadoSensor);
-        control.setObservaciones(req.observaciones);
+        
+        
+        control.setSensorId(req.getSensorId());
+        control.setFechaRevision(req.getFechaRevision());
+        control.setEstadoSensor(req.getEstadoSensor());
+        control.setObservaciones(req.getObservaciones());
 
         return toDto(controlRepository.save(control));
     }
@@ -75,16 +77,16 @@ public class ControlFuncionamientoService {
         ControlFuncionamiento control = controlRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Control de funcionamiento no encontrado con ID: " + id));
 
-        // Validar que el sensor existe
-        if (!sensorRepository.existsById(req.sensorId)) {
-            throw new IllegalArgumentException("Sensor no encontrado con ID: " + req.sensorId);
+        // Validar que el sensor existe (USO DEL GETTER CORREGIDO)
+        if (!sensorRepository.existsById(req.getSensorId())) {
+            throw new IllegalArgumentException("Sensor no encontrado con ID: " + req.getSensorId());
         }
 
-        // Actualizar todos los campos (consistente con ProcesoService)
-        control.setSensorId(req.sensorId);
-        control.setFechaRevision(req.fechaRevision);
-        control.setEstadoSensor(req.estadoSensor);
-        control.setObservaciones(req.observaciones);
+        // Actualizar todos los campos (USO DE GETTERS CORREGIDO)
+        control.setSensorId(req.getSensorId());
+        control.setFechaRevision(req.getFechaRevision());
+        control.setEstadoSensor(req.getEstadoSensor());
+        control.setObservaciones(req.getObservaciones());
 
         return toDto(controlRepository.save(control));
     }
@@ -96,4 +98,3 @@ public class ControlFuncionamientoService {
         controlRepository.deleteById(id);
     }
 }
-

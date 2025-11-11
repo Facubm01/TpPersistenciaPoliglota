@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+
 
 @Data
 @Document(collection = "alertas")
@@ -17,7 +17,7 @@ public class Alerta {
 
     private String sensorId; // Opcional, solo si el tipo es "sensor" [cite: 98]
 
-    private Date fechaHora; 
+    private java.time.LocalDateTime fechaHora; 
 
     private String descripcion; 
 
