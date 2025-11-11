@@ -1,6 +1,6 @@
--- Seed de datos iniciales para MySQL
+-- V3: Seed de datos iniciales para MySQL
 
--- Roles básicos
+-- Roles básicos (Usamos ON DUPLICATE KEY para idempotencia)
 INSERT INTO roles (descripcion) VALUES ('administrador') ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
 INSERT INTO roles (descripcion) VALUES ('tecnico') ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
 INSERT INTO roles (descripcion) VALUES ('usuario') ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
@@ -18,5 +18,3 @@ WHERE u.email = 'admin@example.com' AND r.descripcion = 'administrador'
   AND NOT EXISTS (
       SELECT 1 FROM usuarios_roles ur WHERE ur.usuario_id = u.id AND ur.rol_id = r.id
   );
-
-
